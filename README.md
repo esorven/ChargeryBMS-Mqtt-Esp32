@@ -18,7 +18,7 @@ Some data is calculated from the data received and added to messages :
 The code is for an ESP32:
 
 * connected to a serial ttl<->rs232 converter, ttl side of the converter on pin 16 (serial2) of esp32 and rx side of rs232 to tx of chargery. (cannot use invert logic on serial port of esp32 so converter needed, succeed in arduino uno with softwareserial and inverted logic)
-connected to a server broker (mosquitto) on wifi.
+* connected to a server broker (mosquitto) on wifi.
 
 Extras:
 
