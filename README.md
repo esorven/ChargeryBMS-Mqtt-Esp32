@@ -10,7 +10,8 @@ Extracts frames from Chargery BMS (protocol v1.25) and converts them into messag
 Some data is calculated from the data received and added to messages : 
 * vbatt: the sum of the cells voltages 
 * diffmv: the voltage difference between max cell voltage and min cell voltage 
-* index of cell with min voltage *index of cell with max voltage
+* index of cell with min voltage 
+* index of cell with max voltage
 (for accurate calculation of diffmv and index min and max of cells, you need to specifify in code the total number of wired cells of your battery to the bms)
 
 The code is for an ESP32:
