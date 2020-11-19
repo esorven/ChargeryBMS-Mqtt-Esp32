@@ -35,3 +35,9 @@ Hardware used:
 * CP2102 USB to TTL 6-in-1 Multi-Function Serial Port Module Converter (USB-TTL, USB-232, USB-485, TTL-232, TTL-485, 232-485) for its versatility.
 * Powerbank with two usb outputs (one for powering esp32 and one for powering TTL-232 converter)
 * Two dupont cables female-female to hook the converter to the esp32.
+
+
+Node red flows (dashboard and mqtt inject test data, still need mqtt broker):
+![alt text](medias/node-red-flow.png "Logo Title Text 1")
+![alt text](medias/node-red-ui.png "Logo Title Text 1")
+ [Download Code of flows](/medias/flows.json)
