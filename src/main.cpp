@@ -19,10 +19,11 @@ The frames are parsed, transformed into mqtt messages and published to three top
 // to do ota update via wifi
 #define OTA_HANDLER
 
-//for debug, simulation of bms via bluetooth serial
-// 24 24 56 2D 0C FD 0D 04 0D 04 0D 02 0D 03 0D 04 0D 06 0D 01 0D 08 0D 02 0D 05 0C FE 0D 06 0C FB 0D 0F 0C FC 76 FE D5 02 63 14 0E 00 95
-// 24 24 58 28 01 E4 00 01 00 03 00 03 00 03 00 02 00 03 00 00 00 00 00 01 00 01 00 01 00 00 00 05 00 02 00 03 00 03 00 CC 
-// 24 24 57 0F 0E 24 01 00 E4 00 83 00 84 5B 27
+/*for debug, simulation  frames of bms 16 to send via bluetooth serial
+24 24 56 2D 0C FD 0D 04 0D 04 0D 02 0D 03 0D 04 0D 06 0D 01 0D 08 0D 02 0D 05 0C FE 0D 06 0C FB 0D 0F 0C FC 76 FE D5 02 63 14 0E 00 95
+24 24 58 28 01 E4 00 01 00 03 00 03 00 03 00 02 00 03 00 00 00 00 00 01 00 01 00 01 00 00 00 05 00 02 00 03 00 03 00 CC
+24 24 57 0F 0E 24 01 00 E4 00 83 00 84 5B 27
+*/
 //#define BLUETOOTH
 
 #ifdef OTA_HANDLER
@@ -46,7 +47,9 @@ const int bmsCellsWired = 14;
 const byte rcvhex = 0x56;
 const byte rmvhex = 0x57;
 const byte rcihex = 0x58;
-const byte startByte = 0x24;
+const byte startbytehex = 0x24;
+
+const bool verifyChecksum = true;
 
 // mqtt topics
 #define ROOT_TOPIC "bms"
@@ -99,7 +102,8 @@ void debug_printCmd()
 #if ENABLE_DEBUG_LOG == 1
   for (int i = 0; i < 64; i++)
   {
-    if(cmd[i]<0x10){
+    if (cmd[i] < 0x10)
+    {
       Serial.print("0");
     }
     Serial.print(cmd[i], HEX);
@@ -155,7 +159,7 @@ void listenToBMS()
     incomingByte = bmsSerial.read();
 
     // start pattern 0x24 0x24
-    if (incomingByte == startByte && lastByte == startByte)
+    if (incomingByte == startbytehex && lastByte == startbytehex)
     {
       debug_log("start pattern detected");
       recordData = true;
@@ -262,10 +266,10 @@ DynamicJsonDocument parseRCVToJson()
 
   int startwhbyte = bmsCellsTotal * 2 + 1;
   //rcvJson["wh"] = *(unsigned long *)&cmd[startwhbyte] / 1000.0;
-  rcvJson["wh"] = ((int)cmd[startwhbyte+3]*256*256*256 + (int)cmd[startwhbyte+2]*256*256 + (int)cmd[startwhbyte+1]*256 + (int)cmd[startwhbyte])/1000.0; 
+  rcvJson["wh"] = ((int)cmd[startwhbyte + 3] * 256 * 256 * 256 + (int)cmd[startwhbyte + 2] * 256 * 256 + (int)cmd[startwhbyte + 1] * 256 + (int)cmd[startwhbyte]) / 1000.0;
   startwhbyte = startwhbyte + 4;
   //rcvJson["ah"] = *(unsigned long *)&cmd[startwhbyte] / 1000.0;
-  rcvJson["ah"] =  ((int)cmd[startwhbyte+3]*256*256*256 + (int)cmd[startwhbyte+2]*256*256 + (int)cmd[startwhbyte+1]*256 + (int)cmd[startwhbyte])/1000.0; 
+  rcvJson["ah"] = ((int)cmd[startwhbyte + 3] * 256 * 256 * 256 + (int)cmd[startwhbyte + 2] * 256 * 256 + (int)cmd[startwhbyte + 1] * 256 + (int)cmd[startwhbyte]) / 1000.0;
   rcvJson["vbatt"] = sumCellV;
   JsonObject diff = rcvJson.createNestedObject("diff");
 
@@ -299,7 +303,7 @@ DynamicJsonDocument parseRCIToJson()
   float resistance;
   for (int i = 0; i < bmsCellsTotal; i++)
   {
-    resistance = ((int)cmd[i * 2 + 4] + (int)cmd[i * 2 + 5] * 256 ) / 10.0;
+    resistance = ((int)cmd[i * 2 + 4] + (int)cmd[i * 2 + 5] * 256) / 10.0;
     rCell.add(resistance);
   }
   rciJson["mode"] = (int)cmd[1];
@@ -309,6 +313,37 @@ DynamicJsonDocument parseRCIToJson()
   return rciJson;
 }
 
+bool checkSum(byte frameChecksum, const byte *prefixFrame, const int sizeOfPrefix)
+{
+  bool isValid = false;
+  int checksum = 0;
+
+  for (int i = 0; i < sizeOfPrefix; i++)
+  {
+    checksum += (int)prefixFrame[i];
+    //Serial.print(checksum);
+    //Serial.print("+");
+  }
+  //Serial.println("");
+  // data lenght=cmd[Ø] -3 pour le prefixe -1 pour ne pas compter le checksum
+  for (int i = 0; i < (int)cmd[0] - 3 - 1; i++)
+  {
+    checksum += (int)cmd[i];
+    //Serial.print(checksum);
+    //Serial.print("+");
+  }
+  Serial.println("");
+  int calculatedChecksum = checksum % 256;
+  /*Serial.print("calcCheck=");
+  Serial.println(calculatedChecksum);
+  Serial.println("frameCheck=");
+  Serial.println(frameChecksum);*/
+  if (calculatedChecksum == (int)frameChecksum)
+  {
+    isValid = true;
+  }
+  return isValid;
+}
 void setup()
 {
   Serial.begin(baudrate, rs_config);
@@ -316,8 +351,8 @@ void setup()
   debug_log("serial esp32 begin");
 
 #ifdef BLUETOOTH
-  debug_log("Open Bluetooth Server");
   bmsSerial.begin("BMSTestClient"); //Bluetooth device name
+  debug_log("Open Bluetooth Server");
 #else
   bmsSerial.begin(baudrate, rs_config, 16, 17);
 #endif
@@ -395,12 +430,23 @@ void loop()
 
   //read serial bms
   listenToBMS();
+
   if (newInfo == true)
   {
     switch (newCmd)
     {
     case rmvhex:
     {
+      if (verifyChecksum)
+      {
+        byte prefixrmvframe[3] = {startbytehex, startbytehex, rmvhex};
+        byte frameChecksum = cmd[(int)cmd[0] - 3 - 1]; //normalement 0F=15 et on enleve les 3 premiers non contenus dans cmd.
+        if (!checkSum(frameChecksum, prefixrmvframe, 3))
+        {
+          debug_log("bad checksum rmv frame");
+          break;
+        }
+      }
       char rmvOutput[rmvjsoncapacity];
       serializeJson(parseRMVToJson(), rmvOutput);
       debug_log("publishing rmv msg on topic:");
@@ -410,6 +456,16 @@ void loop()
     }
     case rcvhex:
     {
+      if (verifyChecksum)
+      {
+        byte prefixrcvframe[3] = {startbytehex, startbytehex, rcvhex};
+        byte frameChecksum = cmd[(int)cmd[0] - 3 - 1]; //normalement 0F=15 et on enleve les 3 premiers non contenus dans cmd.
+        if (!checkSum(frameChecksum, prefixrcvframe, 3))
+        {
+          debug_log("bad checksum rcv frame");
+          break;
+        }
+      }
       char rcvOutput[rcvjsoncapacity];
       serializeJson(parseRCVToJson(), rcvOutput);
       debug_log("publishing rcv msg on topic:");
@@ -418,12 +474,24 @@ void loop()
       break;
     }
     case rcihex:
+    {
+      if (verifyChecksum)
+      {
+        byte prefixrciframe[3] = {startbytehex, startbytehex, rcihex};
+        byte frameChecksum = cmd[(int)cmd[0] - 3 - 1]; //normalement 0F=15 et on enleve les 3 premiers non contenus dans cmd.
+        if (!checkSum(frameChecksum, prefixrciframe, 3))
+        {
+          debug_log("bad checksum rci frame");
+          break;
+        }
+      }
       char rciOutput[rcijsoncapacity];
       serializeJson(parseRCIToJson(), rciOutput);
       debug_log("publishing rci msg on topic:");
       debug_log(rcitopic);
       client.publish(rcitopic, rciOutput);
       break;
+    }
     default:
     {
       Serial.println("unknwn!");
