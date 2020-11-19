@@ -1,0 +1,26 @@
+MQTT Client for Chargery BMS
+
+Extracts frames from Chargery BMS (protocol v1.25) and converts them into messages published to a mqqt broker. Messages are published in three topics (each topic corresponding to a frame in bms protocol) :
+
+bms16T/info
+bms16T/voltages
+bms16T/resistances
+Some data is calculated from the data received and added to messages : *vbatt: the sum of the cells voltages *diffmv: the voltage difference between max cell voltage and min cell voltage *index of cell with min voltage *index of cell with max voltage
+
+The code is for an ESP32:
+
+connected to a serial ttl<->rs232 converter, ttl side of the converter on pin 16 (serial2) of esp32 and rx side of rs232 to tx of chargery. (cannot use invert logic on serial port of esp32 so converter needed, succeed in arduino uno with softwareserial and inverted logic)
+connected to a server broker (mosquitto) on wifi
+Extras:
+
+Dashboard created with a flow inside node-red to visualize the incoming messages.
+How to run the dashboard and the mqqt broker on android with termux.
+Ide used:
+
+PlatformIO in visual studio code (alternatively can use arduino ide.)
+Hardware used
+
+ESP32-DevKitC V4
+CP2102 USB to TTL 6-in-1 Multi-Function Serial Port Module Converter (SB-TTL, USB-232, USB-485, TTL-232, TTL-485, 232-485) for its versatility.
+Powerbank with two usb outputs (one for powering esp32 and one for powering TTL-232 converter)
+Two dupont cables female-female to hook the converter to the esp32.
