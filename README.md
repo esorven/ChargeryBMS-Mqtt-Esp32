@@ -5,7 +5,7 @@ Extracts frames from Chargery BMS (protocol v1.25) and converts them into messag
 
 * bms/1_16T/measures
 * bms/1_16T/cellvoltages
-* bms16T/impedances
+* bms/1_16T/cellimpedances
 
 Some data is calculated from the data received and added to messages : 
 * vbatt: the sum of the cells voltages 
