@@ -23,13 +23,15 @@ Extras:
 * Dashboard created with a flow inside node-red to visualize the incoming messages.
 * How to run the dashboard and the mqqt broker on android with termux.
 
-Ide used:
+Software used:
 
 * PlatformIO in visual studio code (alternatively can use arduino ide.)
+* Mosquitto MQTT broker
+* node-red for making dashboard
 
 Hardware used:
 
-* ESP32-DevKitC V4
+* ESP32-DevKitC V4 (partition schema changed for ota+bluetooth, minimum spiffs)
 * CP2102 USB to TTL 6-in-1 Multi-Function Serial Port Module Converter (USB-TTL, USB-232, USB-485, TTL-232, TTL-485, 232-485) for its versatility.
 * Powerbank with two usb outputs (one for powering esp32 and one for powering TTL-232 converter)
 * Two dupont cables female-female to hook the converter to the esp32.
