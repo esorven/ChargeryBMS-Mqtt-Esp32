@@ -33,7 +33,7 @@ Software used:
 
 Hardware used:
 
-* ESP32-DevKitC V4 (partition schema changed for ota+bluetooth, minimum spiffs)
+* ESP32-DevKitC V4 (partition schema changed to have enough space for: ota-firmware update via wifi- and bluetooth-serial input test-)
 * CP2102 USB to TTL 6-in-1 Multi-Function Serial Port Module Converter (USB-TTL, USB-232, USB-485, TTL-232, TTL-485, 232-485) for its versatility.
 * Powerbank with two usb outputs (one for powering esp32 and one for powering TTL-232 converter)
 * Two dupont cables female-female to hook the converter to the esp32.
