@@ -38,6 +38,6 @@ Hardware used:
 
 
 Node red flows (dashboard and mqtt inject test data, still need mqtt broker):
-![alt text](medias/node-red-flow.png "Logo Title Text 1")
-![alt text](medias/node-red-ui.png "Logo Title Text 1")
+![alt text](medias/node-red-flow.png "Flow editor")
+![alt text](medias/node-red-ui.png "Dashboard ui")
  [Download Code of flows](/medias/flows.json)
