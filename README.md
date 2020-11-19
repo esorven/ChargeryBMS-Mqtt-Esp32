@@ -22,7 +22,7 @@ The code is for an ESP32:
 
 Extras:
 
-* Dashboard created with a flow inside node-red to visualize the incoming messages.
+* Dashboard created node-red with a dashboard flow to visualize the incoming messages and a test flow to simulate mqqt messages output without using esp32.
 * How to run the dashboard and the mqqt broker on android with termux.
 
 Software used:
