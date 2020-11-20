@@ -24,6 +24,7 @@ Extras:
 
 * Dashboard created node-red with a dashboard flow to visualize the incoming messages and a test flow to simulate mqqt messages output without using esp32.
 * How to run the dashboard and the mqqt broker on android with termux.
+* Example of sensor definition in home assistant
 
 Software used:
 
@@ -38,8 +39,25 @@ Hardware used:
 * Powerbank with two usb outputs (one for powering esp32 and one for powering TTL-232 converter)
 * Two dupont cables female-female to hook the converter to the esp32.
 
+Extras:
 
-Node red flows (dashboard and mqtt inject test data, still need mqtt broker):
+* Node red flows (dashboard and mqtt inject test data, still need mqtt broker):
 ![alt text](medias/node-red-flow.png "Flow editor")
 ![alt text](medias/node-red-ui.png "Dashboard ui")
  [Download Code of flows](/medias/flows.json)
+
+* Home assistant
+
+After enabling mqtt in file configuration.yaml of home-assistant, add for example in the same file this sensor and map it to a :
+sensor:  
+  - platform: mqtt
+    name: "Soc"
+    state_topic: "bms/1_16T/measures"
+    name: "Chargery BMS16T"
+    unique_id: "1_16T"
+    unit_of_measurement: '%'
+    value_template: "{{ value_json.soc }}"
+    json_attributes_topic: "bms/1_16T/measures"
+
+You will obtain simply this in dashboard:
+![alt text](medias/sensor-home-assistant.png "Sensor")
