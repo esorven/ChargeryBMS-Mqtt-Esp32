@@ -22,9 +22,9 @@ The code is for an ESP32:
 
 Extras:
 
-* Dashboard created node-red with a dashboard flow to visualize the incoming messages and a test flow to simulate mqqt messages output without using esp32.
-* How to run the dashboard and the mqqt broker on android with termux.
-* Example of sensor definition in home assistant
+* Dashboard created node-red (https://nodered.org/) with a dashboard flow to visualize the incoming messages and a test flow to simulate mqqt messages output without using esp32.
+* How to run the dashboard (https://nodered.org/docs/getting-started/android) and the mqqt broker on android with termux.
+* Example of sensor definition in home assistant (https://www.home-assistant.io/)
 
 Software used:
 
