@@ -49,6 +49,7 @@ Extras:
 * Home assistant
 
 After enabling mqtt in file configuration.yaml of home-assistant, add for example in the same file this sensor and map it to a :
+```javascript
 sensor:  
   - platform: mqtt
     name: "Soc"
@@ -58,6 +59,7 @@ sensor:
     unit_of_measurement: '%'
     value_template: "{{ value_json.soc }}"
     json_attributes_topic: "bms/1_16T/measures"
+```
 
 You will obtain simply this in dashboard:
 ![alt text](medias/sensor-home-assistant.png "Sensor")
